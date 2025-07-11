@@ -111,54 +111,59 @@ export default function Form() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSchedule = async (e) => {
-    e.preventDefault();
+ const handleSchedule = async (e) => {
+  e.preventDefault();
 
-    if (!isLoggedIn) {
-      alert("Você precisa estar logado para agendar.");
+  if (!isLoggedIn) {
+    alert("Você precisa estar logado para agendar.");
+    return;
+  }
+
+  if (validateScheduling()) {
+    const token = localStorage.getItem("token");
+    const email = localStorage.getItem("email");
+
+    if (!email) {
+      alert("Email do usuário não encontrado. Faça login novamente.");
       return;
     }
 
-    if (validateScheduling()) {
-      const token = localStorage.getItem("token");
-      const email = localStorage.getItem("email");
+    const scheduleData = {
+      date: selectedDate.toISOString().split("T")[0],
+      time: selectedTime,
+      reason: reason.trim(),
+      user_email: email,
+    };
 
-      const scheduleData = {
-        date: selectedDate.toLocaleDateString("pt-BR"),
-        time: selectedTime,
-        reason: reason.trim(),
-        user_email: email,
-      };
+    console.log("Schedule Data:", scheduleData);
+    console.log("Token:", token);
 
-      try {
-        const response = await fetch("http://localhost:8000/reservar", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(scheduleData),
-        });
+    try {
+      const response = await fetch("http://localhost:8000/reservar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(scheduleData),
+      });
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.detail || "Erro ao agendar");
-        }
-
-        const result = await response.json();
-        alert(result.message);
-
-        // Resetar formulário
-        setSelectedDate(null);
-        setSelectedTime("");
-        setReason("");
-
-      } catch (err) {
-        alert(err.message);
-        console.error("Erro ao enviar agendamento:", err);
+      if (!response.ok) {
+        throw new Error("Erro ao agendar");
       }
+
+      alert("Reserva feita com sucesso!");
+
+      setSelectedDate(null);
+      setSelectedTime("");
+      setReason("");
+    } catch (err) {
+      alert(err.message);
+      console.error("Erro ao enviar agendamento:", err);
     }
-  };
+  }
+};
+
 
   const monthNames = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",

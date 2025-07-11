@@ -1,18 +1,16 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Home from './pages/home'
-import Cadastro from './pages/cadastro'
-import Login from './pages/login'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginForm from "./pages/login"; // Correto: está em src/pages
+import Cadastro from "./pages/cadastro";   // Correto: está em src/pages
+import Form from "./components/form";      // Este está em components, ok
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Form />} />
+        <Route path="/login" element={<LoginForm />} />
         <Route path="/cadastro" element={<Cadastro />} />
-        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
-
-export default App

@@ -33,6 +33,7 @@ const handleSubmit = async (e) => {
 
     // Salvar token no localStorage depois que o login for bem-sucedido
     localStorage.setItem("token", response.data.access_token);
+    localStorage.setItem("email", formData.email);
 
     alert("Login efetuado com sucesso!");
     navigate("/"); // Vai para a página inicial ou dashboard

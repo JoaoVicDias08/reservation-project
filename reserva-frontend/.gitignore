@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Ignorar arquivos compilados pelo Python
+__pycache__/
+*.pyc
+
+# Ignorar banco de dados local
+*.db
+
+# Outros padrões comuns
+.env
+node_modules/
+dist/
