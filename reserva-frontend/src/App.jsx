@@ -5,7 +5,7 @@ import Form from "./components/form";      // Este está em components, ok
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/reservation-project">
       <Routes>
         <Route path="/" element={<Form />} />
         <Route path="/login" element={<LoginForm />} />
