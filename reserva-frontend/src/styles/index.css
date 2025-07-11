@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wght@12..36,300..900&display=swap");
+
+:root {
+  --color-bg: #0b0b0f;
+  --color-form-bg: #15151c;
+  --color-title: #9b5de5;
+  --color-text: #f1f1f1;
+
+--color-button-primary: #00F5A0;
+--color-button-primary-hover: #5FFFC5;
+
+--color-button-secondary: #3A86FF;
+--color-button-secondary-hover: #559CFF;
+
+  --color-highlight: #ffbe0b;
+
+  --font-title: "Lato", sans-serif;
+  --font-text: "TikTok Sans", sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

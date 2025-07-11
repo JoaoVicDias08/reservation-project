@@ -1,0 +1,45 @@
+.feature-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px; /* Espaçamento entre os cards */
+  max-width: 1400px;
+  margin: 40px auto 20px auto; /* Margem superior para separar do formulário */
+  padding: 0 20px; /* Padding lateral para responsividade */
+}
+
+.feature-card {
+  background-color: #15151c; /* Cor de fundo do card */
+  padding: 30px; /* Padding interno */
+  border-radius: 16px; /* Borda arredondada */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Sombra suave */
+  border: 1px solid rgba(155, 93, 229, 0.1); /* Borda sutil */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px); /* Efeito de levantar no hover */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.feature-icon {
+  color: #ffbe0b; /* Cor do ícone (highlight) */
+  margin-bottom: 15px;
+}
+
+.feature-title {
+  color: #9b5de5; /* Cor do título (title) */
+  font-size: 20px; /* Tamanho da fonte do título */
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.feature-description {
+  color: #f1f1f1; /* Cor do texto (text) */
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
