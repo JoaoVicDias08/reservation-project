@@ -383,19 +383,20 @@
 .schedule-button {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #00f5a0, #5fffc5);
+  background: var(--color-button-secondary);
   color: #0b0b0f;
   border: none;
   border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-family: var(--font-text);
 }
 
 .schedule-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 245, 160, 0.3);
+  background-color: var(--color-button-secondary-hover);
 }
 
 .error-message {

@@ -24,3 +24,19 @@ def create_reservation(reservation: ReservationCreate, db: Session = Depends(get
     db.commit()
     db.refresh(new_reservation)
     return {"message": "Reserva feita com sucesso"}
+
+# listar reservas do usuário
+@router.get("/minhas-reservas")
+def listar_reservas(user_email: str, db: Session = Depends(get_db)):
+    reservas = db.query(Reservation).filter(Reservation.user_email == user_email).all()
+    return reservas
+
+# deletar reserva pelo id
+@router.delete("/reservar/{reserva_id}")
+def deletar_reserva(reserva_id: int, db: Session = Depends(get_db)):
+    reserva = db.query(Reservation).filter(Reservation.id == reserva_id).first()
+    if not reserva:
+        raise HTTPException(status_code=404, detail="Reserva não encontrada")
+    db.delete(reserva)
+    db.commit()
+    return {"message": "Reserva removida com sucesso"}

@@ -1,7 +1,8 @@
 import "../styles/form.css";
 import "../styles/index.css";
 
-import Card from './card';
+import Card from "./card";
+import MinhasReservas from "./reservas";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
@@ -24,6 +25,7 @@ export default function Form() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [errors, setErrors] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [refetchKey, setRefetchKey] = useState(0); // NOVO
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -41,7 +43,7 @@ export default function Form() {
   const availableTimes = [
     "08:00", "08:30", "09:00", "09:30", "10:00", "10:30",
     "11:00", "11:30", "14:00", "14:30", "15:00", "15:30",
-    "16:00", "16:30", "17:00", "17:30",
+    "16:00", "16:30", "17:00", "17:30"
   ];
 
   const generateCalendarDays = () => {
@@ -62,7 +64,8 @@ export default function Form() {
       const isCurrentMonth = date.getMonth() === month;
       const isPast = date < today;
       const isToday = date.getTime() === today.getTime();
-      const isSelected = selectedDate && date.getTime() === selectedDate.getTime();
+      const isSelected =
+        selectedDate && date.getTime() === selectedDate.getTime();
 
       days.push({
         date,
@@ -102,7 +105,6 @@ export default function Form() {
 
   const validateScheduling = () => {
     const newErrors = {};
-
     if (!selectedDate) newErrors.date = "Selecione uma data";
     if (!selectedTime) newErrors.time = "Selecione um horário";
     if (!reason.trim()) newErrors.reason = "Informe o motivo do agendamento";
@@ -111,63 +113,61 @@ export default function Form() {
     return Object.keys(newErrors).length === 0;
   };
 
- const handleSchedule = async (e) => {
-  e.preventDefault();
+  const handleSchedule = async (e) => {
+    e.preventDefault();
 
-  if (!isLoggedIn) {
-    alert("Você precisa estar logado para agendar.");
-    return;
-  }
-
-  if (validateScheduling()) {
-    const token = localStorage.getItem("token");
-    const email = localStorage.getItem("email");
-
-    if (!email) {
-      alert("Email do usuário não encontrado. Faça login novamente.");
+    if (!isLoggedIn) {
+      alert("Você precisa estar logado para agendar.");
       return;
     }
 
-    const scheduleData = {
-      date: selectedDate.toISOString().split("T")[0],
-      time: selectedTime,
-      reason: reason.trim(),
-      user_email: email,
-    };
+    if (validateScheduling()) {
+      const token = localStorage.getItem("token");
+      const email = localStorage.getItem("email");
 
-    console.log("Schedule Data:", scheduleData);
-    console.log("Token:", token);
-
-    try {
-      const response = await fetch("http://localhost:8000/reservar", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(scheduleData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erro ao agendar");
+      if (!email) {
+        alert("Email do usuário não encontrado. Faça login novamente.");
+        return;
       }
 
-      alert("Reserva feita com sucesso!");
+      const scheduleData = {
+        date: selectedDate.toISOString().split("T")[0],
+        time: selectedTime,
+        reason: reason.trim(),
+        user_email: email,
+      };
 
-      setSelectedDate(null);
-      setSelectedTime("");
-      setReason("");
-    } catch (err) {
-      alert(err.message);
-      console.error("Erro ao enviar agendamento:", err);
+      try {
+        const response = await fetch("http://localhost:8000/reservar", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(scheduleData),
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro ao agendar");
+        }
+
+        alert("Reserva feita com sucesso!");
+        setSelectedDate(null);
+        setSelectedTime("");
+        setReason("");
+
+        // 🔁 Força o componente MinhasReservas a recarregar
+        setRefetchKey((prev) => prev + 1);
+      } catch (err) {
+        alert(err.message);
+        console.error("Erro ao enviar agendamento:", err);
+      }
     }
-  }
-};
-
+  };
 
   const monthNames = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
   ];
 
   const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -175,14 +175,14 @@ export default function Form() {
   return (
     <div className="form-container">
       <div className="form-content">
-
         {/* Seção de Cadastro/Login */}
         <div className="form-field">
           <div className="form-card">
             <h1 className="form-title">Garanta já sua vaga!</h1>
             <p className="form-text">
-              Evite filas e imprevistos reservando com antecedência. Com apenas alguns cliques, você assegura seu lugar
-              e aproveita uma experiência tranquila, rápida e exclusiva.
+              Evite filas e imprevistos reservando com antecedência. Com apenas
+              alguns cliques, você assegura seu lugar e aproveita uma
+              experiência tranquila, rápida e exclusiva.
             </p>
 
             <div className="benefits-section">
@@ -209,11 +209,17 @@ export default function Form() {
                 </div>
 
                 <div className="form-btn-container">
-                  <button className="form-btn-sign-up" onClick={() => navigate("/cadastro")}>
+                  <button
+                    className="form-btn-sign-up"
+                    onClick={() => navigate("/cadastro")}
+                  >
                     <Users size={18} />
                     Cadastrar-se
                   </button>
-                  <button className="form-btn-login" onClick={() => navigate("/login")}>
+                  <button
+                    className="form-btn-login"
+                    onClick={() => navigate("/login")}
+                  >
                     <LogIn size={18} />
                     Entrar
                   </button>
@@ -221,7 +227,8 @@ export default function Form() {
 
                 <div className="additional-info">
                   <p className="info-text">
-                    Já tem conta? Faça login para acessar seus agendamentos anteriores e preferências salvas.
+                    Já tem conta? Faça login para acessar seus agendamentos
+                    anteriores e preferências salvas.
                   </p>
                 </div>
               </>
@@ -230,7 +237,11 @@ export default function Form() {
                 <button
                   className="form-btn-logout"
                   onClick={handleLogout}
-                  style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
                 >
                   <LogOut size={18} />
                   Sair da conta
@@ -244,29 +255,41 @@ export default function Form() {
         <div className="scheduling-field">
           <div className="scheduling-card">
             <h2 className="scheduling-title">Agende seu Horário</h2>
-            <p className="scheduling-subtitle">Escolha a data, horário e motivo do seu agendamento</p>
+            <p className="scheduling-subtitle">
+              Escolha a data, horário e motivo do seu agendamento
+            </p>
 
             <form onSubmit={handleSchedule}>
-
               <div className="calendar-section">
                 <div className="calendar-header">
                   <button
                     type="button"
                     className="calendar-nav"
                     onClick={() =>
-                      setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))
+                      setCurrentMonth(
+                        new Date(
+                          currentMonth.getFullYear(),
+                          currentMonth.getMonth() - 1
+                        )
+                      )
                     }
                   >
                     <ChevronLeft size={20} />
                   </button>
                   <h3 className="calendar-month">
-                    {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                    {monthNames[currentMonth.getMonth()]}{" "}
+                    {currentMonth.getFullYear()}
                   </h3>
                   <button
                     type="button"
                     className="calendar-nav"
                     onClick={() =>
-                      setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))
+                      setCurrentMonth(
+                        new Date(
+                          currentMonth.getFullYear(),
+                          currentMonth.getMonth() + 1
+                        )
+                      )
                     }
                   >
                     <ChevronRight size={20} />
@@ -286,9 +309,11 @@ export default function Form() {
                     <button
                       key={index}
                       type="button"
-                      className={`calendar-day ${!day.isCurrentMonth ? "other-month" : ""} ${
-                        day.isPast ? "past" : ""
-                      } ${day.isToday ? "today" : ""} ${day.isSelected ? "selected" : ""}`}
+                      className={`calendar-day ${
+                        !day.isCurrentMonth ? "other-month" : ""
+                      } ${day.isPast ? "past" : ""} ${
+                        day.isToday ? "today" : ""
+                      } ${day.isSelected ? "selected" : ""}`}
                       onClick={() => handleDateSelect(day)}
                       disabled={day.isPast || !day.isCurrentMonth}
                     >
@@ -296,7 +321,9 @@ export default function Form() {
                     </button>
                   ))}
                 </div>
-                {errors.date && <span className="error-message">{errors.date}</span>}
+                {errors.date && (
+                  <span className="error-message">{errors.date}</span>
+                )}
               </div>
 
               <div className="time-section">
@@ -309,14 +336,18 @@ export default function Form() {
                     <button
                       key={time}
                       type="button"
-                      className={`time-slot ${selectedTime === time ? "selected" : ""}`}
+                      className={`time-slot ${
+                        selectedTime === time ? "selected" : ""
+                      }`}
                       onClick={() => handleTimeSelect(time)}
                     >
                       {time}
                     </button>
                   ))}
                 </div>
-                {errors.time && <span className="error-message">{errors.time}</span>}
+                {errors.time && (
+                  <span className="error-message">{errors.time}</span>
+                )}
               </div>
 
               <div className="reason-section">
@@ -331,7 +362,9 @@ export default function Form() {
                   onChange={handleReasonChange}
                   rows={3}
                 />
-                {errors.reason && <span className="error-message">{errors.reason}</span>}
+                {errors.reason && (
+                  <span className="error-message">{errors.reason}</span>
+                )}
               </div>
 
               {(selectedDate || selectedTime || reason) && (
@@ -341,7 +374,9 @@ export default function Form() {
                     {selectedDate && (
                       <div className="summary-item">
                         <Calendar size={16} />
-                        <span>Data: {selectedDate.toLocaleDateString("pt-BR")}</span>
+                        <span>
+                          Data: {selectedDate.toLocaleDateString("pt-BR")}
+                        </span>
                       </div>
                     )}
                     {selectedTime && (
@@ -368,6 +403,8 @@ export default function Form() {
               </button>
 
             </form>
+              <MinhasReservas key={refetchKey} />
+
           </div>
         </div>
       </div>
